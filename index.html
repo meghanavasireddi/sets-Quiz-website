@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Sets Quiz</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@700&display=swap');
+    body, html {
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        font-family: 'Raleway', sans-serif;
+        background: linear-gradient(135deg, #2c3e50, #34495e);
+        color: #ecf0f1;
+    }
+    .container {
+        position: relative;
+        width: 80%;
+        max-width: 800px;
+        margin: 20px auto;
+        background: rgba(44, 62, 80, 0.9);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        animation: fadeIn 2s ease-in-out;
+        overflow-y: auto; /* Enable scrolling */
+        max-height: 80vh; /* Limit height */
+    }
+    h1, h2, h3 {
+        text-align: center;
+        color: #f39c12;
+        text-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        font-size: 2em;
+        animation: fadeInDown 1.5s ease-in-out;
+    }
+    h3 {
+        font-size: 1.5em;
+        color: #ecf0f1;
+    }
+    .question {
+        margin: 20px 0;
+        animation: slideInLeft 1s ease-in-out;
+    }
+    .options {
+        margin: 10px 0;
+    }
+    .options label {
+        display: block;
+        margin: 5px 0;
+        cursor: pointer;
+        transition: transform 0.2s ease-in-out;
+    }
+    .options label:hover {
+        transform: scale(1.05);
+    }
+    .correct {
+        color: #2ecc71;
+        font-weight: bold;
+    }
+    .incorrect {
+        color: #e74c3c;
+        font-weight: bold;
+    }
+    .score, .leaderboard {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 1.2em;
+        color: #ecf0f1;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    .hide {
+        display: none;
+    }
+    #animated-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        animation: fadeIn 3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideInLeft {
+        from { opacity: 0; transform: translateX(-100px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Python Sets Quiz</h1>
+    <div id="welcome">
+        <h2>Welcome! Please enter your name to start the quiz:</h2>
+        <input type="text" id="userName" placeholder="Your Name" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #34495e;">
+        <button onclick="startQuiz()" style="width: 100%; padding: 10px; background-color: #f39c12; border: none; color: #fff; font-size: 1.2em; cursor: pointer; border-radius: 5px;">Start Quiz</button>
+    </div>
+    <div id="quiz" class="hide">
+        <!-- Questions will be dynamically inserted here -->
+    </div>
+    <div id="score" class="score hide"></div>
+    <div id="leaderboard" class="leaderboard hide"></div>
+</div>
+
+<canvas id="animated-bg"></canvas>
+
+<script>
+const quizQuestions = [
+    { question: "What is a set in Python?", options: ["A collection of unique elements", "A collection of ordered elements", "A collection of key-value pairs", "A mutable sequence of elements"], correctAnswer: 0, explanation: "A set in Python is an unordered collection of unique elements." },
+    { question: "How do you create an empty set in Python?", options: ["empty_set = []", "empty_set = {}", "empty_set = set()", "empty_set = ()"], correctAnswer: 2, explanation: "{} creates an empty dictionary, so to create an empty set, you use set()." },
+    { question: "Which of the following is not a valid way to create a set in Python?", options: ["my_set = {1, 2, 3}", "my_set = set([1, 2, 3])", "my_set = set((1, 2, 3))", "my_set = {[1, 2, 3]}"], correctAnswer: 3, explanation: "Sets cannot contain mutable elements like lists." },
+    { question: "What will be the output of the following code?\n\nmy_set = {1, 2, 3, 4}\nmy_set.add(5)\nprint(my_set)", options: ["{1, 2, 3, 4}", "{1, 2, 3, 4, 5}", "[1, 2, 3, 4, 5]", "Error"], correctAnswer: 1, explanation: "The add() method adds an element to the set." },
+    { question: "Which method would you use to remove an element from a set if you do not want an error if the element does not exist?", options: ["remove()", "discard()", "delete()", "pop()"], correctAnswer: 1, explanation: "The discard() method removes an element if it exists, without raising an error if it doesn't." },
+    { question: "What does the pop() method do when called on a set?", options: ["Removes and returns a random element from the set", "Removes and returns the last element from the set", "Raises an error if the set is empty", "Does nothing"], correctAnswer: 0, explanation: "Since sets are unordered, the pop() method removes and returns an arbitrary element." },
+    { question: "Which of the following methods is used to find the union of two sets?", options: ["union()", "intersection()", "difference()", "update()"], correctAnswer: 0, explanation: "The union() method returns a set containing all elements from both sets." },
+    { question: "What is the output of the following code?\n\nset1 = {1, 2, 3}\nset2 = {3, 4, 5}\nprint(set1.intersection(set2))", options: ["{1, 2}", "{3}", "{1, 2, 3, 4, 5}", "{1, 2, 4, 5}"], correctAnswer: 1, explanation: "The intersection() method returns a set containing elements that are common to both sets." },
+    { question: "Which method would you use to add all elements of another set to the current set?", options: ["add()", "update()", "append()", "extend()"], correctAnswer: 1, explanation: "The update() method adds all elements from another set (or iterable) to the current set." },
+    { question: "What does the following code do?\n\nset1 = {1, 2, 3}\nset1.clear()", options: ["Deletes the set", "Removes all elements from the set", "Sets all elements to None", "Raises an error"], correctAnswer: 1, explanation: "The clear() method removes all elements from the set, leaving it empty." },
+    { question: "What is the difference between set.difference() and set.symmetric_difference()?", options: ["difference() returns elements not in both sets, symmetric_difference() returns elements in both sets", "difference() returns elements in one set but not the other, symmetric_difference() returns elements in either set but not both", "difference() returns the union of sets, symmetric_difference() returns the intersection", "Both are the same"], correctAnswer: 1, explanation: "difference() gives the elements in the first set but not in the second, while symmetric_difference() gives elements in either set but not both." },
+    { question: "How do you check if a set is a subset of another set in Python?", options: ["subset()", "<=", "issubset()", "Both b and c"], correctAnswer: 3, explanation: "You can use the issubset() method or the <= operator to check if a set is a subset of another." },
+    { question: "What will be the result of the following code?\n\nset1 = {1, 2, 3}\nset2 = {2, 3, 4}\nset1.difference_update(set2)\nprint(set1)", options: ["{1}", "{2, 3}", "{1, 2, 3, 4}", "{}"], correctAnswer: 0, explanation: "The difference_update() method removes elements from set1 that are also in set2." },
+    { question: "Which of the following statements about sets is true?", options: ["Sets can contain duplicate elements", "Sets are ordered", "Sets do not support indexing", "Sets can be indexed"], correctAnswer: 2, explanation: "Sets are unordered and do not support indexing, slicing, or other sequence-like behavior." },
+    { question: "What is the output of the following code?\n\nset1 = {1, 2, 3}\nset1.remove(4)\nprint(set1)", options: ["{1, 2, 3}", "Error", "{}"], correctAnswer: 1, explanation: "The remove() method raises a KeyError if the specified element is not found in the set." },
+    { question: "How do you create a set from a string?", options: ["set('hello')", "set('hello', 'world')", "['hello']", "None of the above"], correctAnswer: 0, explanation: "Creating a set from a string will create a set of characters from the string." },
+    { question: "What will be the output of the following code?\n\nset1 = {1, 2, 3}\nset2 = {4, 5, 6}\nprint(set1 | set2)", options: ["{1, 2, 3, 4, 5, 6}", "{1, 2, 3}", "{4, 5, 6}", "{}"], correctAnswer: 0, explanation: "The | operator returns the union of two sets." },
+    { question: "What does the set.copy() method do?", options: ["Creates a shallow copy of the set", "Creates a deep copy of the set", "Clears the set", "None of the above"], correctAnswer: 0, explanation: "The copy() method returns a shallow copy of the set." },
+    { question: "What will be the result of the following code?\n\nset1 = {1, 2, 3}\nset2 = {1, 2, 3}\nprint(set1 == set2)", options: ["True", "False", "Error", "{}"], correctAnswer: 0, explanation: "Two sets are considered equal if they contain the same elements." },
+    { question: "Which method removes and returns an arbitrary element from a set?", options: ["remove()", "discard()", "pop()", "clear()"], correctAnswer: 2, explanation: "The pop() method removes and returns an arbitrary element from the set." },
+    { question: "Can you use a set as a key in a dictionary?", options: ["Yes, if it is a frozen set", "No, sets are mutable", "Yes, if it is a normal set", "No, dictionary keys cannot be mutable"], correctAnswer: 0, explanation: "Only immutable types like frozen sets can be used as dictionary keys." },
+    { question: "What is the result of the following code?\n\nset1 = {1, 2, 3}\nset2 = {2, 3, 4}\nprint(set1 ^ set2)", options: ["{1, 4}", "{2, 3}", "{1, 4, 5}", "{1, 2, 3, 4}"], correctAnswer: 0, explanation: "The ^ operator returns the symmetric difference of two sets." }
+];
+
+let currentScore = 0;
+let userName = '';
+let leaderboard = [];
+
+function startQuiz() {
+    userName = document.getElementById('userName').value.trim();
+    if (userName === '') {
+        alert('Please enter your name.');
+        return;
+    }
+    document.getElementById('welcome').classList.add('hide');
+    displayQuiz();
+}
+
+function displayQuiz() {
+    const quizContainer = document.getElementById('quiz');
+    quizContainer.innerHTML = '';
+    quizQuestions.forEach((question, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question';
+
+        const questionTitle = document.createElement('h3');
+        questionTitle.textContent = `${index + 1}. ${question.question}`;
+        questionDiv.appendChild(questionTitle);
+
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'options';
+        question.options.forEach((option, i) => {
+            const optionLabel = document.createElement('label');
+            const optionInput = document.createElement('input');
+            optionInput.type = 'radio';
+            optionInput.name = `question${index}`;
+            optionInput.value = i;
+            optionInput.onclick = () => checkAnswer(index, i);
+            optionLabel.appendChild(optionInput);
+            optionLabel.appendChild(document.createTextNode(option));
+            optionsDiv.appendChild(optionLabel);
+        });
+        questionDiv.appendChild(optionsDiv);
+
+        const explanationDiv = document.createElement('div');
+        explanationDiv.id = `explanation${index}`;
+        explanationDiv.className = 'hide';
+        questionDiv.appendChild(explanationDiv);
+
+        quizContainer.appendChild(questionDiv);
+    });
+
+    const submitButton = document.createElement('button');
+    submitButton.textContent = 'Submit Quiz';
+    submitButton.onclick = submitQuiz;
+    submitButton.style = 'width: 100%; padding: 10px; background-color: #f39c12; border: none; color: #fff; font-size: 1.2em; cursor: pointer; border-radius: 5px;';
+    quizContainer.appendChild(submitButton);
+
+    quizContainer.classList.remove('hide');
+}
+
+function checkAnswer(questionIndex, selectedIndex) {
+    const question = quizQuestions[questionIndex];
+    const explanationDiv = document.getElementById(`explanation${questionIndex}`);
+    if (selectedIndex === question.correctAnswer) {
+        explanationDiv.textContent = `Correct! ${question.explanation}`;
+        explanationDiv.className = 'correct';
+        currentScore++;
+    } else {
+        explanationDiv.textContent = `Incorrect! ${question.explanation}`;
+        explanationDiv.className = 'incorrect';
+    }
+    explanationDiv.classList.remove('hide');
+
+    // Disable further selection for this question
+    const options = document.getElementsByName(`question${questionIndex}`);
+    options.forEach(option => option.disabled = true);
+}
+
+function submitQuiz() {
+    document.getElementById('quiz').classList.add('hide');
+    const scoreDiv = document.getElementById('score');
+    scoreDiv.textContent = `Thank you, ${userName}! Your score is: ${currentScore}/${quizQuestions.length}`;
+    scoreDiv.classList.remove('hide');
+    updateLeaderboard();
+    displayLeaderboard();
+}
+
+function updateLeaderboard() {
+    leaderboard.push({ name: userName, score: currentScore });
+    leaderboard.sort((a, b) => b.score - a.score);
+    if (leaderboard.length > 5) leaderboard.pop(); // Keep only top 5 scores
+}
+
+function displayLeaderboard() {
+    const leaderboardDiv = document.getElementById('leaderboard');
+    leaderboardDiv.innerHTML = '<h2>Leaderboard</h2>';
+    leaderboard.forEach((entry, index) => {
+        const entryDiv = document.createElement('div');
+        entryDiv.textContent = `${index + 1}. ${entry.name} - ${entry.score}`;
+        leaderboardDiv.appendChild(entryDiv);
+    });
+    leaderboardDiv.classList.remove('hide');
+}
+
+// Background animation
+const canvas = document.getElementById('animated-bg');
+const ctx = canvas.getContext('2d');
+let width = window.innerWidth;
+let height = window.innerHeight;
+canvas.width = width;
+canvas.height = height;
+
+window.onresize = () => {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+    drawBackground();
+};
+
+function drawBackground() {
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+    for (let i = 0; i < 200; i++) {
+        ctx.fillRect(Math.random() * width, Math.random() * height, 2, 2);
+    }
+    requestAnimationFrame(drawBackground);
+}
+
+drawBackground();
+</script>
+</body>
+</html>
